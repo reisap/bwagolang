@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"golangbwa/helper"
 	"golangbwa/user"
 	"net/http"
@@ -20,11 +19,8 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 	var input user.RegisterUserInput
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		var errors []string
-		for _,e := range err.(validator.ValidationErrors){
-			errors = append(errors,e.Error())
-		}
-		errorMessage := gin.H{"error":errors}
+		formatError := helper.FormatError(err)
+		errorMessage := gin.H{"error":formatError}
 		response := helper.APIResponse("Register account Failed",http.StatusUnprocessableEntity,"error",errorMessage)
 		c.JSON(http.StatusBadRequest,response)
 		return
