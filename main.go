@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"golangbwa/handler"
 	"golangbwa/user"
@@ -22,30 +21,10 @@ func main() {
 	userService := user.NewService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 
-	input := user.LoginInput{
-		Email: "postman@mail.com",
-		Password: "lucubgt",
-	}
-
-	user, err := userService.Login(input)
-
-	if err != nil {
-		fmt.Println("user tidak ditemukan")
-		fmt.Println(err.Error())
-	}
-	fmt.Println(user.Email)
-	fmt.Println(user.Name)
-
-	//userByEmail, err := userRepository.FindByEmail("r.prasapatraay@gmail.com")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//
-	//fmt.Println(userByEmail.Name)
-
 	router := gin.Default()
 	api := router.Group("api/v1")
 	api.POST("/users",userHandler.RegisterUser)
+	api.POST("/sessions",userHandler.Login)
 
 	router.Run()
 

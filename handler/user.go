@@ -43,4 +43,29 @@ func (h *userHandler) Login(c *gin.Context){
 	//input ditangkap handler
 	//mapping user ke service
 	//service -> repository
+
+	var input user.LoginInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		formatError := helper.FormatValidationError(err)
+		errorMessage := gin.H{"error":formatError}
+		response := helper.APIResponse("Login account Failed",http.StatusUnprocessableEntity,"error",errorMessage)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	logginUser, err := h.userService.Login(input)
+	if err != nil {
+		errorMessage := gin.H{"erro":err.Error()}
+		response := helper.APIResponse("Login account Failed",http.StatusUnprocessableEntity,"error",errorMessage)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	formatter := user.FormatUser(logginUser,"token")
+	response := helper.APIResponse("Success Login",http.StatusOK,"success",formatter)
+
+	c.JSON(http.StatusOK,response)
+
+
 }
