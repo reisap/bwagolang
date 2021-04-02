@@ -25,7 +25,6 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest,response)
 		return
 	}
-
 	newUser,err := h.userService.RegisterUser(input)
 	if err != nil {
 		response := helper.APIResponse("Register account Failed",http.StatusBadRequest,"error",nil)
@@ -37,4 +36,11 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 
 	c.JSON(http.StatusOK,response)
 
+}
+
+func (h *userHandler) Login(c *gin.Context){
+	//user input email & password
+	//input ditangkap handler
+	//mapping user ke service
+	//service -> repository
 }
