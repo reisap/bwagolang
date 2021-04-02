@@ -82,7 +82,7 @@ func (h *userHandler) CheckEmailAvailablity(c *gin.Context){
 	}
 	isEmailAvailable, err := h.userService.IsCheckEmail(input)
 	if err != nil {
-		errorMessage := gin.H{"erro":err.Error()}
+		errorMessage := gin.H{"error":err.Error()}
 		response := helper.APIResponse("Email account Failed",http.StatusUnprocessableEntity,"error",errorMessage)
 		c.JSON(http.StatusBadRequest,response)
 		return
@@ -94,6 +94,39 @@ func (h *userHandler) CheckEmailAvailablity(c *gin.Context){
 	}
 	data := gin.H{"isAvailable" : isEmailAvailable}
 	response := helper.APIResponse(metaMessage,http.StatusOK,"success",data)
+
+	c.JSON(http.StatusOK,response)
+
+
+}
+
+func (h *userHandler)UploadAvatars (c *gin.Context){
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded":false}
+		response := helper.APIResponse("Avatar uploaded Failed",http.StatusBadRequest,"error",data)
+		c.JSON(http.StatusBadRequest,response)
+	}
+	path := "images/" + file.Filename
+	err = c.SaveUploadedFile(file,path)
+	if err != nil {
+		errorMessage := gin.H{"error":err.Error()}
+		response := helper.APIResponse("Avatar uploaded Failed",http.StatusBadRequest,"error",errorMessage)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	userId := 1
+	_,err = h.userService.SaveAvatar(userId,path)
+	if err != nil {
+		errorMessage := gin.H{"error":err.Error()}
+		response := helper.APIResponse("Avatar uploaded Failed",http.StatusUnprocessableEntity,"error",errorMessage)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	data := gin.H{"is_uploaded" : true}
+	response := helper.APIResponse("Avatar user success uploaded",http.StatusOK,"success",data)
 
 	c.JSON(http.StatusOK,response)
 
