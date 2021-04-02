@@ -32,12 +32,6 @@ func main() {
 	router.Run()
 
 
-	//contoh cek tanpa service
-	//user := user.User{
-	//	Name:"gorun",
-	//}
-	//userRepository.Save(user)
-
 	//input
 	//handler
 	//services : melakukan mapping dari struct user ke struct repository
