@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golangbwa/helper"
 	"golangbwa/user"
@@ -107,7 +108,9 @@ func (h *userHandler)UploadAvatars (c *gin.Context){
 		response := helper.APIResponse("Avatar uploaded Failed",http.StatusBadRequest,"error",data)
 		c.JSON(http.StatusBadRequest,response)
 	}
-	path := "images/" + file.Filename
+	userId := 1
+	//path := "images/" + file.Filename
+	path := fmt.Sprintf("images/%d-%s",userId,file.Filename)
 	err = c.SaveUploadedFile(file,path)
 	if err != nil {
 		errorMessage := gin.H{"error":err.Error()}
@@ -116,7 +119,7 @@ func (h *userHandler)UploadAvatars (c *gin.Context){
 		return
 	}
 
-	userId := 1
+
 	_,err = h.userService.SaveAvatar(userId,path)
 	if err != nil {
 		errorMessage := gin.H{"error":err.Error()}
