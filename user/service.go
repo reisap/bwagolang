@@ -12,15 +12,15 @@ type Service interface {
 	SaveAvatar (ID int,fileLocation string) (User,error)
 }
 
-type service struct {
+type userService struct {
 	repository Repository
 }
 
-func NewService(repository Repository) *service{
-	return &service{repository}
+func NewService(repository Repository) *userService{
+	return &userService{repository}
 }
 
-func (s *service) RegisterUser(input RegisterUserInput) (User,error){
+func (s *userService) RegisterUser(input RegisterUserInput) (User,error){
 	user := User{}
 	user.Name = input.Name
 	user.Email = input.Email
@@ -41,7 +41,7 @@ func (s *service) RegisterUser(input RegisterUserInput) (User,error){
 
 }
 
-func (s *service)Login (input LoginInput) (User,error){
+func (s *userService)Login (input LoginInput) (User,error){
 	email := input.Email
 	password := input.Password
 
@@ -63,7 +63,7 @@ func (s *service)Login (input LoginInput) (User,error){
 
 }
 
-func (s *service)IsCheckEmail (input CheckEmailInput) (bool,error){
+func (s *userService)IsCheckEmail (input CheckEmailInput) (bool,error){
 	email := input.Email
 	user,err := s.repository.FindByEmail(email)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *service)IsCheckEmail (input CheckEmailInput) (bool,error){
 	return false,nil
 }
 
-func (s *service)SaveAvatar (ID int,fileLocation string) (User,error){
+func (s *userService)SaveAvatar (ID int,fileLocation string) (User,error){
 	//dapatkan user berdasarkan id
 	//update atrribute avatar
 	//simpan perubahan

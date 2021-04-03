@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"golangbwa/auth"
 	"golangbwa/helper"
 	"golangbwa/user"
 	"net/http"
@@ -10,10 +11,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler{
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service,authService auth.Service) *userHandler{
+	return &userHandler{userService,authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context){
@@ -32,7 +34,15 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest,response)
 		return
 	}
-	formatter := user.FormatUser(newUser,"token")
+
+	token,err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Token generate account Failed",http.StatusBadRequest,"error",nil)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	formatter := user.FormatUser(newUser,token)
 	response := helper.APIResponse("Account has been registered",http.StatusOK,"success",formatter)
 
 	c.JSON(http.StatusOK,response)
@@ -44,7 +54,6 @@ func (h *userHandler) Login(c *gin.Context){
 	//input ditangkap handler
 	//mapping user ke service
 	//service -> repository
-
 	var input user.LoginInput
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -63,11 +72,17 @@ func (h *userHandler) Login(c *gin.Context){
 		return
 	}
 
-	formatter := user.FormatUser(logginUser,"token")
+	token,err := h.authService.GenerateToken(logginUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Token generate account Failed",http.StatusBadRequest,"error",nil)
+		c.JSON(http.StatusBadRequest,response)
+		return
+	}
+
+	formatter := user.FormatUser(logginUser,token)
 	response := helper.APIResponse("Success Login",http.StatusOK,"success",formatter)
 
 	c.JSON(http.StatusOK,response)
-
 
 }
 
@@ -98,7 +113,6 @@ func (h *userHandler) CheckEmailAvailablity(c *gin.Context){
 
 	c.JSON(http.StatusOK,response)
 
-
 }
 
 func (h *userHandler)UploadAvatars (c *gin.Context){
@@ -120,7 +134,7 @@ func (h *userHandler)UploadAvatars (c *gin.Context){
 	}
 
 
-	_,err = h.userService.SaveAvatar(userId,path)
+	_,err = h.userService.SaveAvatar(userId,path) //bisa diganti tergantung namanya
 	if err != nil {
 		errorMessage := gin.H{"error":err.Error()}
 		response := helper.APIResponse("Avatar uploaded Failed",http.StatusUnprocessableEntity,"error",errorMessage)
