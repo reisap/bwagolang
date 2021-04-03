@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golangbwa/auth"
+	"golangbwa/campaign"
 	"golangbwa/handler"
 	"golangbwa/helper"
 	"golangbwa/user"
@@ -21,14 +23,37 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
+	//repository
 	userRepository := user.NewRepository(db)
+	campaignsRepository := campaign.NewRepository(db)
 	//service
 	userService := user.NewService(userRepository)
 	authService := auth.NewJwtService()
 
 	//handler
 	userHandler := handler.NewUserHandler(userService,authService)
+
+	//test campaigns
+	campaigns,errCampaing := campaignsRepository.FindByAll()
+	if errCampaing != nil {
+		fmt.Println(errCampaing)
+	}
+	for _, data := range(campaigns) {
+		fmt.Println(data.Name)
+
+	}
+
+	fmt.Println("===============")
+	//test campaign by userID
+	campaignUserID, errIMages := campaignsRepository.FindByUserID(4)
+	if errIMages != nil {
+		fmt.Println(errIMages)
+	}
+
+	fmt.Println(campaignUserID)
+
+
+
 
 	router := gin.Default()
 	api := router.Group("api/v1")
