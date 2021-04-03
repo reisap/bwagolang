@@ -7,6 +7,7 @@ type Repository interface {
 	//Save(campaign Campaign) (Campaign,error)
 	FindByUserID (userID int) ([]Campaign,error)
 	FindByAll () ([]Campaign,error)
+	FindById(ID int) (Campaign,error)
 
 }
 
@@ -37,5 +38,14 @@ func (r *repository)FindByAll () ([]Campaign,error){
 		return campaigns,err
 	}
 
+	return campaigns,nil
+}
+
+func (r *repository)FindById(ID int) (Campaign,error){
+	var campaigns Campaign
+	err := r.db.Where("id = ?",ID).Preload("CampaignImages").Preload("User").Find (&campaigns).Error
+	if err != nil {
+		return campaigns,err
+	}
 	return campaigns,nil
 }

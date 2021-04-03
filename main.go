@@ -51,6 +51,7 @@ func main() {
 
 	//campaign
 	api.GET("/campaign",campaignHandler.GetCampaign)
+	api.GET("/campaign/:id",campaignHandler.DetailCampaign)
 	router.Run()
 
 
