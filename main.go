@@ -40,17 +40,20 @@ func main() {
 	}
 	for _, data := range(campaigns) {
 		fmt.Println(data.Name)
+		if len(data.CampaignImages) > 0 {
+			fmt.Println(data.CampaignImages[0].FileName)
+		}
 
 	}
 
-	fmt.Println("===============")
-	//test campaign by userID
-	campaignUserID, errIMages := campaignsRepository.FindByUserID(4)
-	if errIMages != nil {
-		fmt.Println(errIMages)
-	}
-
-	fmt.Println(campaignUserID)
+	//fmt.Println("===============")
+	////test campaign by userID
+	//campaignUserID, errIMages := campaignsRepository.FindByUserID(4)
+	//if errIMages != nil {
+	//	fmt.Println(errIMages)
+	//}
+	//
+	//fmt.Println(campaignUserID)
 
 
 
