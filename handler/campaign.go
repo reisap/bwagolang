@@ -17,23 +17,23 @@ func NewCampaignHandler(service campaign.Service) *campaignHandler{
 }
 
 func (h *campaignHandler)GetCampaign(c *gin.Context){
+	//strconv.Atoi digunakan untuk convert string into integer
 	userID,_ := strconv.Atoi(c.Query("user_id"))
 	campaigns,err := h.service.GetCampaigns(userID)
 
 	if err != nil{
-		formatError := helper.FormatValidationError(err)
-		errorMessage := gin.H{"error":formatError}
-		response := helper.APIResponse("Campaign Failed",http.StatusBadRequest,"error",errorMessage)
-		c.JSON(http.StatusBadRequest,response)
-		return
-	}
-	if len(campaigns) == 0{
 		errorMessage := gin.H{"error":"Data Campaign Not Found"}
 		response := helper.APIResponse("Campaign Failed",http.StatusBadRequest,"error",errorMessage)
 		c.JSON(http.StatusBadRequest,response)
 		return
 	}
+	//if len(campaigns) == 0{
+	//	errorMessage := gin.H{"error":"Data Campaign Not Found"}
+	//	response := helper.APIResponse("Campaign Failed",http.StatusBadRequest,"error",errorMessage)
+	//	c.JSON(http.StatusBadRequest,response)
+	//	return
+	//}
 
-	response := helper.APIResponse("Campaign  List success",http.StatusOK,"success",campaigns)
+	response := helper.APIResponse("Campaign  List success",http.StatusOK,"success",campaign.FormatCampaigns(campaigns))
 	c.JSON(http.StatusOK,response)
 }
