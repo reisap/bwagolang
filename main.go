@@ -4,10 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"golangbwa/auth"
 	"golangbwa/handler"
+	"golangbwa/helper"
 	"golangbwa/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
+	"strings"
+	"github.com/dgrijalva/jwt-go"
 )
 
 func main() {
@@ -31,7 +35,7 @@ func main() {
 	api.POST("/users",userHandler.RegisterUser)
 	api.POST("/sessions",userHandler.Login)
 	api.POST("/email_checkers",userHandler.CheckEmailAvailablity)
-	api.POST("/avatar",userHandler.UploadAvatars)
+	api.POST("/avatar",authMiddleware(authService,userService),userHandler.UploadAvatars)
 
 	router.Run()
 
@@ -41,4 +45,46 @@ func main() {
 	//services : melakukan mapping dari struct user ke struct repository
 	//repository
 	//db
+}
+
+func authMiddleware(authService auth.Service,userService user.Service) gin.HandlerFunc{
+	return func (c *gin.Context){
+		authHeader := c.GetHeader("Authorization")
+
+		if !strings.Contains(authHeader,"Bearer"){
+			response := helper.APIResponse("Unauthorized",http.StatusUnauthorized,"error",nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized,response)
+			return
+		}
+		tokenString := ""
+		arrToken := strings.Split(authHeader," ")
+		if len(arrToken) == 2{
+			tokenString = arrToken[1]
+		}
+		token,err := authService.ValidateToken(tokenString)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized",http.StatusUnauthorized,"error",nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized,response)
+			return
+		}
+
+		claim,ok := token.Claims.(jwt.MapClaims)
+
+		if !ok || !token.Valid {
+			response := helper.APIResponse("Unauthorized",http.StatusUnauthorized,"error",nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized,response)
+			return
+		}
+
+		userID := int(claim["user_id"].(float64))
+		user,err := userService.GetUserByID(userID)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized",http.StatusUnauthorized,"error",nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized,response)
+			return
+		}
+
+		c.Set("currentUser",user)
+
+	}
 }

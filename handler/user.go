@@ -122,7 +122,8 @@ func (h *userHandler)UploadAvatars (c *gin.Context){
 		response := helper.APIResponse("Avatar uploaded Failed",http.StatusBadRequest,"error",data)
 		c.JSON(http.StatusBadRequest,response)
 	}
-	userId := 1
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
 	//path := "images/" + file.Filename
 	path := fmt.Sprintf("images/%d-%s",userId,file.Filename)
 	err = c.SaveUploadedFile(file,path)
