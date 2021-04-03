@@ -40,6 +40,9 @@ func main() {
 
 
 	router := gin.Default()
+	//untuk dapat akses gambar yang disimpan di server
+	router.Static("/images","./images") // ./images -> ini folder langsung di server,klon manya lucu maka ./lucu
+
 	api := router.Group("api/v1")
 	api.POST("/users",userHandler.RegisterUser)
 	api.POST("/sessions",userHandler.Login)
