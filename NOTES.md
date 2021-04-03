@@ -1,4 +1,4 @@
-##```Learn from bwa```
+##Learn from bwa
 
 `Urutan Mapping Code:`
 1. Input
