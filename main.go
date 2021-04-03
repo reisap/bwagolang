@@ -29,33 +29,14 @@ func main() {
 	//service
 	userService := user.NewService(userRepository)
 	authService := auth.NewJwtService()
+	campaignService := campaign.NewService(campaignsRepository)
+
+	fmt.Println(campaignService)
+
 
 	//handler
 	userHandler := handler.NewUserHandler(userService,authService)
-
-	//test campaigns
-	campaigns,errCampaing := campaignsRepository.FindByAll()
-	if errCampaing != nil {
-		fmt.Println(errCampaing)
-	}
-	for _, data := range(campaigns) {
-		fmt.Println(data.Name)
-		if len(data.CampaignImages) > 0 {
-			fmt.Println(data.CampaignImages[0].FileName)
-		}
-
-	}
-
-	//fmt.Println("===============")
-	////test campaign by userID
-	//campaignUserID, errIMages := campaignsRepository.FindByUserID(4)
-	//if errIMages != nil {
-	//	fmt.Println(errIMages)
-	//}
-	//
-	//fmt.Println(campaignUserID)
-
-
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 
 	router := gin.Default()
@@ -65,6 +46,8 @@ func main() {
 	api.POST("/email_checkers",userHandler.CheckEmailAvailablity)
 	api.POST("/avatar",authMiddleware(authService,userService),userHandler.UploadAvatars)
 
+	//campaign
+	api.GET("/campaign",campaignHandler.GetCampaign)
 	router.Run()
 
 
